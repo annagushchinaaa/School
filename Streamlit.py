@@ -6,7 +6,6 @@ import numpy as np
 import plotly.express as px
 import pydeck as pdk
 import matplotlib.pyplot as plt
-import celluloid
 import airportsdata
 airports = airportsdata.load('IATA')  # key is ICAO code, the default
 
