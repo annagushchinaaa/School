@@ -1,27 +1,17 @@
 import calendar
-
+import time
 import streamlit as st
 import pandas as pd
 import numpy as np
-import json
 import plotly.express as px
 import pydeck as pdk
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import streamlit.components.v1 as components
 import celluloid
 import airportsdata
 airports = airportsdata.load('IATA')  # key is ICAO code, the default
 
-
-st.write("### Ann is the best")
-
 c=pd.read_csv("nyc-flights.csv")
-st.write(c)
-
-#with open('countries.geo.json') as json_file:
-#    json_locations = json.load(json_file)
-
+st.write('# New York Airport activity visualization.')
 coun=c['dest'].value_counts()
 origincity=[]
 destcity=[]
@@ -39,15 +29,18 @@ df=pd.DataFrame(
      coorddep,
      columns=['lat', 'lon', 'rad'])
 
-
+### FROM: https://proglib.io/p/sozdanie-interaktivnyh-paneley-s-streamlit-i-python-2021-06-21
 show_data = st.sidebar.checkbox('Show raw data')
 if show_data == True:
     st.subheader('Raw data')
     st.markdown(
-        "#### Data on COVID-19 (coronavirus) by Our World in Data could be found [here](https://github.com/owid/covid-19-data/tree/master/public/data).")
+        "#### Data on flights from New York airports can be found [here](https://www.kaggle.com/datasets/sveneschlbeck/new-york-city-airport-activity).")
     st.write(c)
-
+### END FROM
 ### Creating a map where a bigger dot means that there were more flights to this airport
+st.write('## The bigger the dot is on the map, the more flights were made to this destination.')
+
+### Based ON FROM: https://deckgl.readthedocs.io/en/latest/gallery/scatterplot_layer.html
 st.pydeck_chart(pdk.Deck(
      map_style='mapbox://styles/mapbox/light-v9',
      initial_view_state=pdk.ViewState(
@@ -73,12 +66,12 @@ st.pydeck_chart(pdk.Deck(
          ),
      ],
  ))
+### END FROM
 
-import calendar
 c['month']=pd.to_datetime(c['month'], format='%m').dt.month_name()
 cnew=c.groupby('month')['dest'].value_counts()
 
-
+st.write("## Now let's see what are the most popular destinations each month.")
 option=st.selectbox("What month do you want to see?", ['January', 'February', 'March', 'April',
                                                                    'May', 'June', 'July', 'August',
                                                                    'September', 'October', 'November', 'December'])
@@ -86,34 +79,10 @@ option=st.selectbox("What month do you want to see?", ['January', 'February', 'M
 fig = px.bar(cnew[option].transpose(), y='dest',labels={'dest':'number of flights', 'index':'airport'}, title="Flight Destinations")
 st.plotly_chart(fig)
 
-check=[]
-st.header('Will your flight be delayed?')
-opt=st.selectbox('Where are you going?', c['dest'].unique())
 
-delay=[]
-for i in range (len(c['dest'].unique())):
-    s=[]
-    if c['dest'][i]==c['dest'].unique()[i]:
-        s.append(c['dep_delay'][i])
-    delay.append(s)
-st.write(delay)
-
-#fig=plt.figure(figsize=(12,10))
-#plt.xlabel("Air Time", fontsize=20)
-#plt.ylabel("Distance", fontsize=20)
-#plt.scatter(c['air_time'],c['distance'],color='red')
-#st.pyplot(fig)
-
-fig=(plt.figure(figsize=(12,10))
-camera=Camera(fig)
-for i in range (0,len(c['air_time'])):
-    x=c['air_time'][i]
-    y=c['distance'][i]
-
-    plt.scatter(x[0],y[0])
-    plt.scatter(x[1:],y[1:])
-
-    camera.snap()
-animation=camera.animate()
-ani=animation.FuncAnimation(fig)
+st.write('## Now lets prove the direct relationship between the air time and distance.')
+fig=plt.figure(figsize=(11,10))
+plt.xlabel("Air time", fontsize=20)
+plt.ylabel("Distance", fontsize=20)
+plt.scatter(c['air_time'],c['distance'],color='red')
 st.pyplot(fig)
