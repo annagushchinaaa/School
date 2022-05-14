@@ -6,6 +6,10 @@ import numpy as np
 import json
 import plotly.express as px
 import pydeck as pdk
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import streamlit.components.v1 as components
+import celluloid
 import airportsdata
 airports = airportsdata.load('IATA')  # key is ICAO code, the default
 
@@ -82,3 +86,34 @@ option=st.selectbox("What month do you want to see?", ['January', 'February', 'M
 fig = px.bar(cnew[option].transpose(), y='dest',labels={'dest':'number of flights', 'index':'airport'}, title="Flight Destinations")
 st.plotly_chart(fig)
 
+check=[]
+st.header('Will your flight be delayed?')
+opt=st.selectbox('Where are you going?', c['dest'].unique())
+
+delay=[]
+for i in range (len(c['dest'].unique())):
+    s=[]
+    if c['dest'][i]==c['dest'].unique()[i]:
+        s.append(c['dep_delay'][i])
+    delay.append(s)
+st.write(delay)
+
+#fig=plt.figure(figsize=(12,10))
+#plt.xlabel("Air Time", fontsize=20)
+#plt.ylabel("Distance", fontsize=20)
+#plt.scatter(c['air_time'],c['distance'],color='red')
+#st.pyplot(fig)
+
+fig=(plt.figure(figsize=(12,10))
+camera=Camera(fig)
+for i in range (0,len(c['air_time'])):
+    x=c['air_time'][i]
+    y=c['distance'][i]
+
+    plt.scatter(x[0],y[0])
+    plt.scatter(x[1:],y[1:])
+
+    camera.snap()
+animation=camera.animate()
+ani=animation.FuncAnimation(fig)
+st.pyplot(fig)
