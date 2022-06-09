@@ -4,6 +4,5 @@ matplotlib==3.5.2
 geopandas
 folium
 selenium
-selenium.webdriver.common.by
 selenium.webdriver.chrome.service
 webdriver_manager.chrome
