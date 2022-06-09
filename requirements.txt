@@ -5,3 +5,4 @@ geopandas
 folium
 selenium
 webdriver-manager
+seleniumbase
